@@ -1,0 +1,28 @@
+Informationen:
+
+  Plugin Name: Yearly Month Archive
+  Plugin URI:  http://blog.tigion.de/2007/10/16/wordpress-plugin-yearly-month-archive/
+  Description: Ein nach Jahren unterteiltes Monatsarchiv mit
+               alternativer Ausgabe in Spalten mit oder ohne
+               kleiner Statistik.
+  Version:     0.1
+  Author:      Christoph Zirkelbach
+  Author URI:  http://blog.tigion.de/
+
+Beschreibung:
+
+  Das Plugin Yearly Month Archive für Wordpress erzeugt, ähnlich der
+  hauseigenen Wordpress Funktion wp_get_archives(), ein nach Jahren
+  nterteiltes Monatsarchiv. Die Ausgabe kann alternativer in Spalten,
+  mit oder ohne kleiner Statistik, ausgegeben werden.
+
+Hinweis:
+
+  Dies ist eine erst frühe Version und aktuell nur in deutsch verfügbar.
+  Ich übernehme kein Risiko für durch das Plugin entstandene Schäden.
+  Bisherige Tests bei mir liefen fehlerfrei und ich bin über jeden
+  Hinweis zur Fehlerbeseitigung oder Kritik dankbar
+
+Installation und Verwendung:
+
+  siehe: http://blog.tigion.de/2007/10/16/wordpress-plugin-yearly-month-archive/
