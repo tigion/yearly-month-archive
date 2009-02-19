@@ -30,8 +30,8 @@
   float: left;
 }
 
-.yearly_month_archive .clear_left {
-  clear: left;
+.yearly_month_archive .year_row {
+  clear: both;
 }
 
 .yearly_month_archive .graphic_stats {
