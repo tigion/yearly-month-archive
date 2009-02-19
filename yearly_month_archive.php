@@ -3,7 +3,7 @@
 Plugin Name: Yearly Month Archive
 Plugin URI: http://blog.tigion.de/2007/10/16/wordpress-plugin-yearly-month-archive/
 Description: Ein nach Jahren unterteiltes Monatsarchiv mit alternativer Ausgabe in Spalten mit oder ohne kleiner Statistik.
-Version: 0.2
+Version: 0.3
 Author: Christoph Zirkelbach
 Author URI: http://blog.tigion.de/
 */
@@ -88,6 +88,107 @@ function twp_show_stats($result_year) {
   echo $output;
 }
 
+// output graphic archive statistics
+function twp_show_archive_stats($archive_stats) {
+  $newline = "\n";
+  $url = get_bloginfo('wpurl').'/wp-content/plugins/yearly-month-archive/';
+  $img1 = "img_bar.jpg";
+  $img2 = "img_bar_empty.gif";
+  $img3 = "img_bar_max.jpg";
+  $img4 = "img_bar_newyear.jpg";
+  $img_width = 10;
+  $img_height_max = 100;
+  $img_height = 0;
+  
+  // get month count and max post count
+  $tmp_year = 0;
+  $year_count = 0;
+  $max_posts = 0;
+  $max_year = 0;
+  $min_year = 0;
+  for ($i = (count($archive_stats) - 1); $i >= 0; $i--) {  
+    $tmp_data = explode("_", $archive_stats[$i]);
+    $year = $tmp_data[0];
+    $month = $tmp_data[1];
+    $posts = $tmp_data[2];
+    
+    // min year
+    if ($min_year == 0)
+      $min_year = $year;
+      
+    // max year
+    if ($max_year < $year)
+      $max_year = $year;
+    
+    if ($tmp_year != 0 && $year > $tmp_year)
+      $year_count++; 
+    
+    // max posts
+    if ($posts > $max_posts)
+      $max_posts = $posts;
+      
+    $tmp_year = $year;
+  }
+  $month_count = (12 * $year_count) + $month + ($year_count - 1);
+  
+  // get image width
+  $img_width = (100 / $month_count);
+  $img_width = $img_width."%";
+
+  //
+  if ($year_count == 1)
+    echo '<h2 style="clear:both;padding-top:20px;">'.$min_year.'</h2>'.$newline;
+  else
+    echo '<h2 style="clear:both;padding-top:20px;">'.$min_year.' - '.$max_year.'</h2>'.$newline;
+  echo '<div class="graphic_stats">';
+
+  $tmp_month = 1;
+  $tmp_year = 0;
+  for ($i = (count($archive_stats) - 1); $i >= 0; $i--) {
+    $tmp_data = explode("_", $archive_stats[$i]);
+    $year = $tmp_data[0];
+    $month = $tmp_data[1];
+    $count = $tmp_data[2];
+
+    // new year
+    if ($tmp_year != 0 && $tmp_year < $year) {
+      // fill empty month after
+      for ($tmp_month; $tmp_month <= 12; $tmp_month++) {
+        echo '<img src="'.$url.$img2.'" width="'.$img_width.'" height="1" alt="" />';
+      }
+      echo '<img src="'.$url.$img4.'" width="'.$img_width.'" height="10" alt="" />';
+      $tmp_month = 1;
+    }
+
+    // fill empty month before
+    for ($tmp_month; $tmp_month < $month; $tmp_month++) {
+      echo '<img src="'.$url.$img2.'" width="'.$img_width.'" height="1" alt="" />';
+    }
+
+    // get image height
+    $img_height = (int) ($count * 100 / $max_posts);
+
+    //
+    if ($count == 1)
+      $title = $count." Blogbeitrag";
+    else
+      $title = $count." Blogbeiträge";
+    $title .= " (".$month."/".$year.")";
+    
+    //
+    if ($count == $max_posts)
+      $img = $img3;
+    else
+      $img = $img1;    
+ 
+    echo '<img src="'.$url.$img.'" width="'.$img_width.'" height="'.$img_height.'" title="'.$title.'" alt="" />';
+  
+    $tmp_month++;
+    $tmp_year = $year;
+  }
+  echo '</div>'.$newline;
+}
+
 // main function - plugin: yearly month archive
 function twp_yearly_month_archive($args = '') {
   global $wpdb, $wp_locale;
@@ -96,15 +197,17 @@ function twp_yearly_month_archive($args = '') {
   $max_columns = 10;
   $newline = "\n";
   $css_clear_left = '';
+  $archive_stats[] = '';
 
   // set default values and parse arguments
   $defaults = array (
     'limit_years' => '',
     'columns' => '0',
+    'use_container' => 'div',
     'show_empty_months' => false,
     'show_stats' => false,
     'show_post_count' => false,
-    'use_container' => 'none'
+    'show_graphic_stats' => false
   );
 
   $r = wp_parse_args( $args, $defaults );
@@ -126,10 +229,6 @@ function twp_yearly_month_archive($args = '') {
   else
     $columns = (int) $columns;
 
-  // check argument 'show_empty_months'
-  // check argument 'show_stats'
-  // check argument 'show_post_count'
-
   // check argument 'use_container'
   $use_table = false;
   $use_div = false;
@@ -138,7 +237,12 @@ function twp_yearly_month_archive($args = '') {
   elseif ($use_container == "div")
     $use_div = true;
   else
-    ; // none
+    $use_div = true;
+
+  // check argument 'show_empty_months'
+  // check argument 'show_stats'
+  // check argument 'show_post_count'
+  // check argument 'show_graphic_stats'
 
   /*// limit higher columns to 'limit_years'
   if ($limit_years != '' && $columns > $limit_years)
@@ -160,6 +264,8 @@ function twp_yearly_month_archive($args = '') {
   
   // show years
   if ($result_years) {
+    $month_count = 0;
+
   	// first lines
   	echo '<div class="yearly_month_archive">'.$newline;
   	if ($use_table) {
@@ -172,6 +278,7 @@ function twp_yearly_month_archive($args = '') {
     foreach ($result_years as $result_year) {
       $tmp_columns++;
       $text = sprintf('%d', $result_year->year);
+
       if ($use_table) {
         echo '<td>'.$newline;
       } elseif ($use_div) {
@@ -202,6 +309,10 @@ function twp_yearly_month_archive($args = '') {
             $text .= ' <small>('.sprintf('%d', $result_month->posts).')</small>';
           }
           echo '<li>'.$text.'</li>'.$newline;
+
+          // save monthly post count
+          $archive_stats[$month_count] = $result_month->year.'_'.$result_month->month.'_'.$result_month->posts;
+          $month_count++;
         }
         // show empty months
         if ($show_empty_months)
@@ -245,6 +356,11 @@ function twp_yearly_month_archive($args = '') {
       echo '</tr>'.$newline;
       echo '</table>'.$newline;
     }
+    
+    // show graphic statistics
+    if ($show_graphic_stats)
+      twp_show_archive_stats ($archive_stats);
+
     echo '</div>'.$newline;
   } else {
     // no posts found

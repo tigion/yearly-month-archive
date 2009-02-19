@@ -5,7 +5,7 @@ Informationen:
   Description: Ein nach Jahren unterteiltes Monatsarchiv mit
                alternativer Ausgabe in Spalten mit oder ohne
                kleiner Statistik.
-  Version:     0.2
+  Version:     0.3
   Author:      Christoph Zirkelbach
   Author URI:  http://blog.tigion.de/
 
@@ -41,3 +41,8 @@ Changelog:
   [X] Einbindung eines Stylesheets
   [X] Statistikausgabe Einzahl/Mehrzahl
   [X] Codeoptimierungen
+
+  0.3 (26.10.2007)
+  [X] Logik fuer 'columns' und 'use_container' angepasst
+  [X] Balkendiagramm ueber Archivverlauf samt Grafiken
+  [X] Option: show_graphic_stats

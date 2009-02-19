@@ -33,3 +33,14 @@
 .yearly_month_archive .clear_left {
   clear: left;
 }
+
+.yearly_month_archive .graphic_stats {
+  clear: both;
+  border-bottom: 1px dotted #aaa;
+  height: 100px;
+  padding-top: 20px;
+  text-align: center;
+}
+
+.yearly_month_archive .graphic_stats img {
+}
