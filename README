@@ -5,7 +5,7 @@ Informationen:
   Description: Ein nach Jahren unterteiltes Monatsarchiv mit
                alternativer Ausgabe in Spalten mit oder ohne
                kleiner Statistik.
-  Version:     0.3.1
+  Version:     0.4
   Author:      Christoph Zirkelbach
   Author URI:  http://blog.tigion.de/
 
@@ -51,3 +51,8 @@ Changelog:
   [X] Fehlerbehebung (css/html/php): Jahresbereiche als Div-Container
       wurden in Folgezeilen untereinander statt spaltenweise nebeneinander
       dargestellt
+
+  0.4 (22.02.2008)
+  [X] Sortierreihenfolge ab- oder aufsteigend für Jahr und Monat hinzugefügt
+  [X] Neue Option: sort_order
+  [X] Kleinere Anpassung des Stylesheets

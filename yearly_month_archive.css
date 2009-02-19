@@ -9,6 +9,10 @@
 .yearly_month_archive ul {
 }
 
+.yearly_month_archive li {
+  height: 1.5em;
+}
+
 .yearly_month_archive li:hover {
   color: #e71;
 }
