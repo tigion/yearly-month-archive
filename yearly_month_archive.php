@@ -3,7 +3,7 @@
 Plugin Name: Yearly Month Archive
 Plugin URI: http://blog.tigion.de/2007/10/16/wordpress-plugin-yearly-month-archive/
 Description: Ein nach Jahren unterteiltes Monatsarchiv mit alternativer Ausgabe in Spalten mit oder ohne kleiner Statistik.
-Version: 0.4
+Version: 0.4next
 Author: Christoph Zirkelbach
 Author URI: http://blog.tigion.de/
 */
@@ -74,7 +74,7 @@ function twp_show_stats($result_year) {
 
   $output .= $newline;
 
-  echo $output;
+  return $output;
 }
 
 // output graphic archive statistics
@@ -88,6 +88,7 @@ function twp_show_archive_stats($archive_stats) {
   $img_width = 10;
   $img_height_max = 100;
   $img_height = 0;
+  $output = '';
 
   // sort order to past -> future
   sort($archive_stats);
@@ -139,10 +140,10 @@ function twp_show_archive_stats($archive_stats) {
 
   //
   if ($year_count == 1)
-    echo '<h2 style="clear:both;padding-top:20px;">'.$min_year.'</h2>'.$newline;
+    $output .= '<h2 style="clear:both;padding-top:20px;">'.$min_year.'</h2>'.$newline;
   else
-    echo '<h2 style="clear:both;padding-top:20px;">'.$min_year.' - '.$max_year.'</h2>'.$newline;
-  echo '<div class="graphic_stats">';
+    $output .= '<h2 style="clear:both;padding-top:20px;">'.$min_year.' - '.$max_year.'</h2>'.$newline;
+  $output .= '<div class="graphic_stats">';
 
   $tmp_month = 1;
   $tmp_year = 0;
@@ -154,7 +155,7 @@ function twp_show_archive_stats($archive_stats) {
 
     // new year
     if ($tmp_year != 0 && $tmp_year != $year) {
-      echo '<img src="'.$url.$img4.'" width="'.$img_width.'" height="10" alt="" />';
+      $output .= '<img src="'.$url.$img4.'" width="'.$img_width.'" height="10" alt="" />';
       $tmp_month = 1;
     }
 
@@ -174,16 +175,18 @@ function twp_show_archive_stats($archive_stats) {
     else
       $img = $img1;    
  
-    echo '<img src="'.$url.$img.'" width="'.$img_width.'" height="'.$img_height.'" title="'.$title.'" alt="" />';
+    $output .= '<img src="'.$url.$img.'" width="'.$img_width.'" height="'.$img_height.'" title="'.$title.'" alt="" />';
   
     $tmp_month++;
     $tmp_year = $year;
   }
-  echo '</div>'.$newline;
+  $output .= '</div>'.$newline;
+
+  return $output;
 }
 
 // main function - plugin: yearly month archive
-function twp_yearly_month_archive($args = '') {
+function twp_get_yearly_month_archive($args = '') {
   global $wpdb, $wp_locale;
   
   // variables
@@ -192,6 +195,7 @@ function twp_yearly_month_archive($args = '') {
   $css_clear_left = '';
   $result_months_fill[12];
   $archive_stats[] = '';
+  $output = '';
 
   // set default values and parse arguments
   $defaults = array (
@@ -269,20 +273,20 @@ function twp_yearly_month_archive($args = '') {
   $result_years = $wpdb->get_results("SELECT DISTINCT YEAR(post_date) AS `year`, count(ID) as posts FROM $wpdb->posts $join $where GROUP BY YEAR(post_date) $order_by".$limit_years_sql);
   
   // start output
-  echo $newline.'<!-- START: Plugin - Yearly Month Archive -->'.$newline;
+  $output = $newline.'<!-- START: Plugin - Yearly Month Archive -->'.$newline;
   
   // show years
   if ($result_years) {
     $month_count = 0;
 
     // first lines
-    echo '<div class="yearly_month_archive">'.$newline;
+    $output .= '<div class="yearly_month_archive">'.$newline;
     if ($use_table) {
-      echo '<table style="width:100%;">'.$newline;
-      echo '<colgroup width="'.floor(100/$columns).'%" span="'.$columns.'"></colgroup>'.$newline;
-      echo '<tr>'.$newline;
+      $output .= '<table style="width:100%;">'.$newline;
+      $output .= '<colgroup width="'.floor(100/$columns).'%" span="'.$columns.'"></colgroup>'.$newline;
+      $output .= '<tr>'.$newline;
     } else {
-      echo '<div class="year_row">'.$newline;
+      $output .= '<div class="year_row">'.$newline;
     }
     $tmp_columns = 0;
     
@@ -291,11 +295,11 @@ function twp_yearly_month_archive($args = '') {
       $text = sprintf('%d', $result_year->year);
 
       if ($use_table) {
-        echo '<td>'.$newline;
+        $output .= '<td>'.$newline;
       } elseif ($use_div) {
-        echo '<div class="year'.$css_clear_left.'" style="width:'.floor(100/$columns).'%;">'.$newline;
+        $output .= '<div class="year'.$css_clear_left.'" style="width:'.floor(100/$columns).'%;">'.$newline;
       }
-      echo '<h2>'.$text.'</h2>'.$newline;
+      $output .= '<h2>'.$text.'</h2>'.$newline;
 
       // get months for year
       $where = apply_filters('getarchives_where', "WHERE post_type = 'post' AND post_status = 'publish' AND YEAR(post_date) = '".$result_year->year."'", $r );
@@ -325,13 +329,13 @@ function twp_yearly_month_archive($args = '') {
 
       // show months
       if ($result_months) {
-        echo '<ul>'.$newline;
+        $output .= '<ul>'.$newline;
 
         foreach ($result_months_fill as $result_month) {
           if ($result_month->posts == 0) {
             if ($show_empty_months) {
               $text = sprintf(__('%1$s'), $wp_locale->get_month($result_month->month));
-              echo '<li class="empty_month">'.$text.'</li>';
+              $output .= '<li class="empty_month">'.$text.'</li>';
             }
           } else {
             $url  = get_month_link($result_month->year, $result_month->month);
@@ -339,7 +343,7 @@ function twp_yearly_month_archive($args = '') {
             if ($show_post_count) {
               $text .= ' <small>('.sprintf('%d', $result_month->posts).')</small>';
             }
-            echo '<li>'.$text.'</li>';
+            $output .= '<li>'.$text.'</li>';
           }
 
           // save monthly post count
@@ -347,16 +351,16 @@ function twp_yearly_month_archive($args = '') {
           $month_count++;
         }
 
-        echo '</ul>'.$newline;
+        $output .= '</ul>'.$newline;
           
         // show stats
         if ($show_stats)
-          twp_show_stats($result_year);
+          $output .= twp_show_stats($result_year);
 
         if ($use_table)
-          echo '</td>'.$newline;
+          $output .= '</td>'.$newline;
         elseif ($use_div)
-          echo '</div>'.$newline;
+          $output .= '</div>'.$newline;
       }
       
       // column layout
@@ -364,12 +368,12 @@ function twp_yearly_month_archive($args = '') {
       if ($tmp_columns == $columns && count($result_years) != $columns) {
         if ($use_table) {
           $tmp_columns = 0;
-          echo '</tr>'.$newline;
-          echo '<tr>'.$newline;
+          $output .= '</tr>'.$newline;
+          $output .= '<tr>'.$newline;
         } elseif ($use_div) {
           $tmp_columns = 0;
-          echo '</div>'.$newline;
-          echo '<div class="year_row">'.$newline;
+          $output .= '</div>'.$newline;
+          $output .= '<div class="year_row">'.$newline;
         }
       }
     }
@@ -377,33 +381,40 @@ function twp_yearly_month_archive($args = '') {
     // add empty cells
     if ($use_table) {
       for ($tmp_columns; $tmp_columns < $columns; $tmp_columns++) {
-        echo '<td></td>'.$newline;
+        $output .= '<td></td>'.$newline;
       }
     }
     
     // last lines
     if ($use_table) {
-      echo '</tr>'.$newline;
-      echo '</table>'.$newline;
+      $output .= '</tr>'.$newline;
+      $output .= '</table>'.$newline;
     } else {
-      echo '</div>'.$newline;
+      $output .= '</div>'.$newline;
     }
     
     // show graphic statistics
     if ($show_graphic_stats)
-      twp_show_archive_stats ($archive_stats);
+      $output .= twp_show_archive_stats ($archive_stats);
 
-    echo '</div>'.$newline;
+    $output .= '</div>'.$newline;
   } else {
     // no posts found
-    echo '<p>Es sind keine Blogeinträge für ein Archiv vorhanden.</p>'.$newline;
+    $output .= '<p>Es sind keine Blogeinträge für ein Archiv vorhanden.</p>'.$newline;
   }
   // end output
-  echo '<!-- END: Plugin - Yearly Month Archive -->'.$newline;
+  $output .= '<!-- END: Plugin - Yearly Month Archive -->'.$newline;
+
+  return $output;
+}
+
+// insert result in Theme (compatibility for versions until 0.4)
+function twp_yearly_month_archive($args = '') {
+  echo twp_get_yearly_month_archive($args);
 }
 
 // actions and filters
-if (function_exists('twp_yearly_month_archive')) {
+if (function_exists('twp_get_yearly_month_archive')) {
   // add plugin stylesheet to template head
   add_action('wp_head', 'twp_add_stylesheet');
 }
