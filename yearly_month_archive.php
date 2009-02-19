@@ -3,7 +3,7 @@
 Plugin Name: Yearly Month Archive
 Plugin URI: http://blog.tigion.de/2007/10/16/wordpress-plugin-yearly-month-archive/
 Description: Ein nach Jahren unterteiltes Monatsarchiv mit alternativer Ausgabe in Spalten mit oder ohne kleiner Statistik.
-Version: 0.1
+Version: 0.1.1
 Author: Christoph Zirkelbach
 Author URI: http://blog.tigion.de/
 */
@@ -103,6 +103,13 @@ function twp_yearly_month_archive($args = '') {
             $text .= ' <small>('.sprintf('%d', $result_month->posts).')</small>';
           }
           echo '<li>'.$text.'</li>'.$newline;
+        }
+        // show empty monthd
+        if ($show_empty_months) {
+          for ($tmp_empty_months; $tmp_empty_months > 0; $tmp_empty_months--) {
+            $text = sprintf(__('%1$s'), $wp_locale->get_month($tmp_empty_months));
+            echo '<li>'.$text.'</li>'.$newline;
+          }
         }
         echo '</ul>'.$newline;
           
