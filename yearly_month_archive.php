@@ -200,6 +200,7 @@ function twp_get_yearly_month_archive($args = '') {
   // set default values and parse arguments
   $defaults = array (
     'limit_years' => '',
+    'hide_current_year' => false,
     'columns' => '0',
     'use_container' => 'div',
     'show_empty_months' => false,
@@ -213,10 +214,17 @@ function twp_get_yearly_month_archive($args = '') {
   extract( $r, EXTR_SKIP );
 
   // check argument 'limit_years'
+  $limit_years_sql = '';
   if ($limit_years != '') {
     $limit_years = (int) $limit_years;
-    $limit_years_sql = ' LIMIT '.$limit_years;
+    if ($limit_years > 0)
+      $limit_years_sql = ' LIMIT '.$limit_years;
   }
+
+  // check arguments 'hide_current_year'
+  $where_hide_current_year_sql = '';
+  if ($hide_current_year)
+    $where_hide_current_year_sql = ' AND YEAR(post_date) < YEAR (CURRENT_DATE)';
 
   // check argument 'columns'
   if ($columns == 0 || $columns == '')
@@ -268,6 +276,7 @@ function twp_get_yearly_month_archive($args = '') {
 
   // get years
   $where = apply_filters('getarchives_where', "WHERE post_type = 'post' AND post_status = 'publish'", $r );
+  $where .= $where_hide_current_year_sql;
   $join = apply_filters('getarchives_join', "", $r);
   $order_by = 'ORDER BY post_date '.$sort_order_year;
   $result_years = $wpdb->get_results("SELECT DISTINCT YEAR(post_date) AS `year`, count(ID) as posts FROM $wpdb->posts $join $where GROUP BY YEAR(post_date) $order_by".$limit_years_sql);
