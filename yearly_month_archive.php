@@ -3,7 +3,7 @@
 Plugin Name: Yearly Month Archive
 Plugin URI: http://blog.tigion.de/2007/10/16/wordpress-plugin-yearly-month-archive/
 Description: Ein nach Jahren unterteiltes Monatsarchiv mit alternativer Ausgabe in Spalten mit oder ohne kleiner Statistik.
-Version: 0.4next
+Version: 0.5
 Author: Christoph Zirkelbach
 Author URI: http://blog.tigion.de/
 */
@@ -429,14 +429,13 @@ function twp_filter_yearly_month_archive($content) {
   // only for (static) pages
   if (is_page()) {
     // find replacements and extract params
-    preg_match_all("|\[yearly-month-archive[ ](.*)\]|U", $content, $result, PREG_PATTERN_ORDER);
+    preg_match_all("|\[yearly-month-archive(.*)\]|U", $content, $result, PREG_PATTERN_ORDER);
 
     if (count($result) > 0) {
-      foreach ($result[1] as $params) {
-        $params = str_replace(',', '&', trim($params));
+      foreach ($result[1] as $part) {
+        $params = str_replace(',', '&', trim($part));
         $output = twp_get_yearly_month_archive($params);
-        $content = preg_replace("/\[yearly-month-archive(.*?)\]/", $output, $content);
-        break; //TODO: allow more as one replacement
+        $content = preg_replace("/\[yearly-month-archive".$part."\]/", $output, $content);
       }
     }
   }
