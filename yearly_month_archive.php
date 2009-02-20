@@ -413,10 +413,38 @@ function twp_yearly_month_archive($args = '') {
   echo twp_get_yearly_month_archive($args);
 }
 
+// replace placeholder in content of pages
+// use: [yearly-month-archive] (for standard params)
+//      [yearly-month-archive param1=<value>,param2=<value>,...]
+function twp_filter_yearly_month_archive($content) {
+  // only for (static) pages
+  if (is_page()) {
+    // find replacements and extract params
+    preg_match_all("|\[yearly-month-archive[ ](.*)\]|U", $content, $result, PREG_PATTERN_ORDER);
+
+    if (count($result) > 0) {
+      foreach ($result[1] as $params) {
+        $params = str_replace(',', '&', trim($params));
+        $output = twp_get_yearly_month_archive($params);
+        $content = preg_replace("/\[yearly-month-archive(.*?)\]/", $output, $content);
+        break; //TODO: allow more as one replacement
+      }
+    }
+  }
+
+  return $content;
+}
+
 // actions and filters
-if (function_exists('twp_get_yearly_month_archive')) {
-  // add plugin stylesheet to template head
+
+// action: add plugin stylesheet to template head
+if (function_exists('twp_add_stylesheet')) {
   add_action('wp_head', 'twp_add_stylesheet');
+}
+
+// filter: add replacement filter for the content
+if (function_exists('twp_filter_yearly_month_archive')) {
+  add_filter('the_content', 'twp_filter_yearly_month_archive');
 }
 
 ?>
