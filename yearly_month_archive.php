@@ -84,7 +84,7 @@ function twp_show_archive_stats($archive_stats) {
   $img1 = "img_bar.jpg";
   $img2 = "img_bar_empty.gif";
   $img3 = "img_bar_max.jpg";
-  $img4 = "img_bar_newyear.jpg";
+  $img4 = "img_bar_newyear.gif";
   $img_width = 10;
   $img_height_max = 100;
   $img_height = 0;
@@ -155,7 +155,7 @@ function twp_show_archive_stats($archive_stats) {
 
     // new year
     if ($tmp_year != 0 && $tmp_year != $year) {
-      $output .= '<img src="'.$url.$img4.'" width="'.$img_width.'" height="10" alt="" />';
+      $output .= '<img src="'.$url.$img4.'" width="3" height="10" alt="" />';
       $tmp_month = 1;
     }
 

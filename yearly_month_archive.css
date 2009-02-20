@@ -47,4 +47,5 @@
 }
 
 .yearly_month_archive .graphic_stats img {
+  padding: 0 !important;
 }
