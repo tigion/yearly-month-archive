@@ -3,24 +3,24 @@
 Plugin Name: Yearly Month Archive
 Plugin URI: http://blog.tigion.de/2007/10/16/wordpress-plugin-yearly-month-archive/
 Description: Ein nach Jahren unterteiltes Monatsarchiv mit alternativer Ausgabe in Spalten mit oder ohne kleiner Statistik.
-Version: 0.5
+Version: 0.5.1
 Author: Christoph Zirkelbach
 Author URI: http://blog.tigion.de/
 */
 
 /*
  * Copyright 2007 Christoph Zirkelbach  (email: tigion [at] bsd-crew.de)
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
@@ -92,7 +92,7 @@ function twp_show_archive_stats($archive_stats) {
 
   // sort order to past -> future
   sort($archive_stats);
-  
+
   // remove last empty month
   while(true) {
     $tmp_data = explode("_", $archive_stats[count($archive_stats) - 1]);
@@ -101,7 +101,7 @@ function twp_show_archive_stats($archive_stats) {
     else
       break;
   }
-  
+
   // get month count and max post count
   $tmp_year = 0;
   $year_count = 0;
@@ -113,26 +113,26 @@ function twp_show_archive_stats($archive_stats) {
     $year = $tmp_data[0];
     $month = ltrim($tmp_data[1]," ");
     $posts = $tmp_data[2];
-    
+
     // min year
     if ($min_year == 0 || $min_year > $year)
       $min_year = $year;
-      
+
     // max year
     if ($max_year < $year)
       $max_year = $year;
-    
+
     if ($tmp_year != 0 && $year != $tmp_year)
-      $year_count++; 
-    
+      $year_count++;
+
     // max posts
     if ($posts > $max_posts)
       $max_posts = $posts;
-      
+
     $tmp_year = $year;
   }
   $month_count = (12 * $year_count) + $month + ($year_count - 1);
-  
+
   // get image width
   //$img_width = (100 / $month_count);
   $img_width = (100 / ($month_count + 1));  // dirty hack +1
@@ -168,15 +168,15 @@ function twp_show_archive_stats($archive_stats) {
     else
       $title = $count." Blogbeiträge";
     $title .= " (".$month."/".$year.")";
-    
+
     //
     if ($count == $max_posts)
       $img = $img3;
     else
-      $img = $img1;    
- 
+      $img = $img1;
+
     $output .= '<img src="'.$url.$img.'" width="'.$img_width.'" height="'.$img_height.'" title="'.$title.'" alt="" />';
-  
+
     $tmp_month++;
     $tmp_year = $year;
   }
@@ -188,7 +188,7 @@ function twp_show_archive_stats($archive_stats) {
 // main function - plugin: yearly month archive
 function twp_get_yearly_month_archive($args = '') {
   global $wpdb, $wp_locale;
-  
+
   // variables
   $max_columns = 10;
   $newline = "\n";
@@ -280,10 +280,10 @@ function twp_get_yearly_month_archive($args = '') {
   $join = apply_filters('getarchives_join', "", $r);
   $order_by = 'ORDER BY post_date '.$sort_order_year;
   $result_years = $wpdb->get_results("SELECT DISTINCT YEAR(post_date) AS `year`, count(ID) as posts FROM $wpdb->posts $join $where GROUP BY YEAR(post_date) $order_by".$limit_years_sql);
-  
+
   // start output
   $output = $newline.'<!-- START: Plugin - Yearly Month Archive -->'.$newline;
-  
+
   // show years
   if ($result_years) {
     $month_count = 0;
@@ -298,7 +298,7 @@ function twp_get_yearly_month_archive($args = '') {
       $output .= '<div class="year_row">'.$newline;
     }
     $tmp_columns = 0;
-    
+
     foreach ($result_years as $result_year) {
       $tmp_columns++;
       $text = sprintf('%d', $result_year->year);
@@ -323,6 +323,8 @@ function twp_get_yearly_month_archive($args = '') {
           $idx = 11 - $i;
         else
           $idx = $i;
+
+        $result_months_fill[$idx] = new stdClass();
         $result_months_fill[$idx]->year = $result_year->year;
         $result_months_fill[$idx]->month = $idx + 1;
         $result_months_fill[$idx]->posts = 0;
@@ -361,7 +363,7 @@ function twp_get_yearly_month_archive($args = '') {
         }
 
         $output .= '</ul>'.$newline;
-          
+
         // show stats
         if ($show_stats)
           $output .= twp_show_stats($result_year);
@@ -371,7 +373,7 @@ function twp_get_yearly_month_archive($args = '') {
         elseif ($use_div)
           $output .= '</div>'.$newline;
       }
-      
+
       // column layout
       $css_clear_left = '';
       if ($tmp_columns == $columns && count($result_years) != $columns) {
@@ -386,14 +388,14 @@ function twp_get_yearly_month_archive($args = '') {
         }
       }
     }
-    
+
     // add empty cells
     if ($use_table) {
       for ($tmp_columns; $tmp_columns < $columns; $tmp_columns++) {
         $output .= '<td></td>'.$newline;
       }
     }
-    
+
     // last lines
     if ($use_table) {
       $output .= '</tr>'.$newline;
@@ -401,7 +403,7 @@ function twp_get_yearly_month_archive($args = '') {
     } else {
       $output .= '</div>'.$newline;
     }
-    
+
     // show graphic statistics
     if ($show_graphic_stats)
       $output .= twp_show_archive_stats ($archive_stats);
