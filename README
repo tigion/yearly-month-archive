@@ -5,7 +5,7 @@ Informationen:
   Description: Ein nach Jahren unterteiltes Monatsarchiv mit
                alternativer Ausgabe in Spalten mit oder ohne
                kleiner Statistik.
-  Version:     0.5
+  Version:     0.5.2
   Author:      Christoph Zirkelbach
   Author URI:  http://blog.tigion.de/
 
@@ -61,3 +61,9 @@ Changelog:
   [X] add a new replacement filter for an easy way to show the archive
   [X] add new parameter 'hide_current_year' and a little fix for parameter 'limit_years'
   [X] a little update for the horrible graphical archive statistics
+
+  0.5.1 (02.04.2013)
+  [X] A little PHP > v5.2 fix and tab tp space conversion.
+
+  0.5.2 (03.04.2013)
+  [X] A little CSS fix for the buggy graphic stats.
